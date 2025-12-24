@@ -1,4 +1,29 @@
-# Welcome to Your Miaoda Project
+# Sunny Kumar - Premium Portfolio
+
+A high-end, ultra-modern personal portfolio web application featuring cinematic animations, 3D effects, and futuristic interactions designed for recruiters, startups, and clients.
+
+## ✨ Features
+
+### 🎨 Visual Design
+- **Neon Cyberpunk Theme**: Deep black backgrounds with neon blue (#00D9FF), electric purple (#B24BF3), and cyan (#4DFFF3) accents
+- **Glassmorphism Effects**: Frosted glass cards with backdrop blur and neon outline borders
+- **Custom Cursor**: Interactive cursor with hover state changes
+- **Smooth Animations**: GSAP scroll-triggered zoom effects and Framer Motion transitions
+
+### 🚀 Technical Features
+- **Three.js Background**: Animated 3D particles and geometric shapes that react to mouse movement and scroll
+- **Typewriter Animation**: Rotating text in hero section with smooth transitions
+- **Scroll Animations**: Parallax effects and zoom animations triggered by scroll position
+- **Responsive Design**: Mobile-first approach with breakpoints for all devices
+- **Contact Form**: Integrated with Supabase for storing form submissions
+
+### 📱 Sections
+1. **Hero Section**: Split layout with professional photo and animated typewriter text
+2. **About Me**: Animated text reveal with statistics and highlights
+3. **Skills**: Categorized skill cards with hover effects (Frontend, Backend, Database, Tools, Animation)
+4. **Projects**: Portfolio showcase with project cards and hover glow effects
+5. **Experience**: Timeline-style layout showing career progression
+6. **Contact**: Animated contact form with social links and contact information
 
 ## Project Info
 
@@ -35,7 +60,14 @@
 
 ## Tech Stack
 
-Vite, TypeScript, React, Supabase
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS + Custom CSS animations
+- **UI Components**: shadcn/ui component library
+- **3D Graphics**: Three.js for animated backgrounds
+- **Animations**: GSAP (ScrollTrigger) + Framer Motion
+- **Backend**: Supabase (PostgreSQL database)
+- **Form Handling**: React Hook Form + Zod validation
+- **Icons & Fonts**: Google Fonts (Inter), Unicode emojis
 
 ## Development Guidelines
 
