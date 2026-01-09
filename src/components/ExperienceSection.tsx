@@ -175,9 +175,9 @@ export default function ExperienceSection() {
                         <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
                           {exp.title}
                         </h3>
-                        <p className="text-lg font-semibold text-muted-foreground">
+                        {/* <p className="text-lg font-semibold text-muted-foreground">
                           {exp.company}
-                        </p>
+                        </p> */}
                       </div>
 
                       {/* Description */}
