@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
+import TypewriterText from './ui/TypewriterText';
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -8,9 +9,7 @@ export default function AboutSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        setIsVisible(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
@@ -71,9 +70,13 @@ export default function AboutSection() {
                 <span className="neon-text-cyan font-semibold">visually stunning</span>, performant, and scalable web applications with modern UI/UX.
               </p>
 
-              <p className="text-lg xl:text-xl leading-relaxed text-muted-foreground">
-                With a keen eye for design and a deep understanding of modern web technologies, I transform complex ideas into elegant, user-friendly digital solutions. 
-                My approach combines technical excellence with creative innovation to deliver exceptional results.
+              <p className="text-lg xl:text-xl leading-relaxed text-muted-foreground min-h-[100px]">
+                <TypewriterText
+                  text="With a keen eye for design and a deep understanding of modern web technologies, I transform complex ideas into elegant, user-friendly digital solutions. My approach combines technical excellence with creative innovation to deliver exceptional results."
+                  start={isVisible}
+                  speed={20}
+                  delay={1500}
+                />
               </p>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 pt-8">
@@ -118,8 +121,8 @@ export default function AboutSection() {
             className="grid grid-cols-2 xl:grid-cols-4 gap-6"
           >
             {[
-              { value: '50+', label: 'Projects Completed' },
-              { value: '3+', label: 'Years Experience' },
+              { value: '30+', label: 'Projects Completed' },
+              { value: '2+', label: 'Years Experience' },
               { value: '100%', label: 'Client Satisfaction' },
               { value: '24/7', label: 'Support Available' },
             ].map((stat, index) => (

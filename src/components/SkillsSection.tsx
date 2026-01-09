@@ -1,11 +1,12 @@
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
+import TypewriterText from './ui/TypewriterText';
 
 const skills = [
   {
     category: 'Frontend',
     icon: '🎨',
-    items: ['React', 'Tailwind CSS', 'JavaScript', 'TypeScript', 'HTML5', 'CSS3'],
+    items: ['React', 'Tailwind CSS', 'JavaScript', 'TypeScript', 'HTML5', 'Modern CSS'],
     color: 'blue',
   },
   {
@@ -21,9 +22,27 @@ const skills = [
     color: 'cyan',
   },
   {
+    category: 'Mobile App Development',
+    icon: '📱',
+    items: ['Flutter', 'Dart', 'Swift (iOS)', 'Android Dev', 'iOS Dev', 'Cross-Platform'],
+    color: 'blue',
+  },
+  {
+    category: 'Programming Languages',
+    icon: '💻',
+    items: ['C', 'C++', 'Java', 'Python', 'JavaScript', 'TypeScript', 'Dart'],
+    color: 'purple',
+  },
+  {
+    category: 'UI / UX & Design',
+    icon: '✒️',
+    items: ['Figma', 'Canva', 'UI Wireframing', 'UX Design', 'Design Systems', 'Responsive Design', 'A11y'],
+    color: 'cyan',
+  },
+  {
     category: 'Tools & Others',
     icon: '🛠️',
-    items: ['Git', 'GitHub', 'VS Code', 'Postman', 'npm/yarn'],
+    items: ['Git', 'GitHub', 'VS Code', 'Postman', 'npm/yarn', 'n8n'],
     color: 'blue',
   },
   {
@@ -47,9 +66,7 @@ export default function SkillsSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        setIsVisible(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
@@ -88,6 +105,19 @@ export default function SkillsSection() {
         return 'neon-text-cyan';
       default:
         return 'neon-text-blue';
+    }
+  };
+
+  const getItemHoverClass = (color: string) => {
+    switch (color) {
+      case 'blue':
+        return 'hover:border-blue-500/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:bg-blue-500/10 hover:text-blue-200';
+      case 'purple':
+        return 'hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:bg-purple-500/10 hover:text-purple-200';
+      case 'cyan':
+        return 'hover:border-cyan-400/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:bg-cyan-400/10 hover:text-cyan-200';
+      default:
+        return 'hover:border-blue-500/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:bg-blue-500/10 hover:text-blue-200';
     }
   };
 
@@ -158,7 +188,7 @@ export default function SkillsSection() {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={isVisible ? { opacity: 1, scale: 1 } : {}}
                       transition={{ duration: 0.4, delay: 1 + index * 0.1 + itemIndex * 0.05 }}
-                      className="glass-card px-4 py-2 rounded-full text-sm font-medium text-foreground hover:scale-105 transition-transform duration-300 cursor-default"
+                      className={`glass-card px-4 py-2 rounded-full text-sm font-medium text-foreground transition-all duration-300 cursor-pointer border border-transparent hover:scale-105 ${getItemHoverClass(skill.color)}`}
                     >
                       {item}
                     </motion.span>
@@ -176,10 +206,22 @@ export default function SkillsSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 1.5 }}
-            className="glass-card neon-border-blue rounded-3xl p-8 text-center hover-glow-blue"
+            className="glass-card neon-border-blue rounded-3xl py-6 px-10 text-center hover-glow-blue flex items-center justify-center"
           >
             <p className="text-lg xl:text-xl text-muted-foreground">
-              <span className="neon-text-blue font-semibold">Always learning</span> and staying up-to-date with the latest technologies and best practices in web development.
+              <span className="neon-text-blue font-semibold">
+                <TypewriterText
+                  text="Always learning"
+                  start={isVisible}
+                  delay={1500}
+                  showCursor={false}
+                />
+              </span>
+              <TypewriterText
+                text=" and staying up-to-date with the latest technologies and best practices in web development."
+                start={isVisible}
+                delay={1950} // 1500 + (15 chars * 30ms) = 1950ms
+              />
             </p>
           </motion.div>
         </motion.div>

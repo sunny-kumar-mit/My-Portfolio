@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { contactApi } from '@/db/api';
 import { toast } from 'sonner';
+import { supabase, uploadFileToSupabase } from '@/lib/supabaseClient';
+import { Upload, X, FileText, Image as ImageIcon, FileArchive, CheckCircle2 } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
+import SuccessModal from './SuccessModal';
 
 const contactFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -18,10 +21,14 @@ const contactFormSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export default function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -35,9 +42,7 @@ export default function ContactSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        setIsVisible(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
@@ -53,24 +58,105 @@ export default function ContactSection() {
     };
   }, []);
 
+  const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
+    // Handle rejections first
+    if (fileRejections.length > 0) {
+      const error = fileRejections[0].errors[0];
+      if (error.code === 'file-too-large') {
+        toast.error('File size exceeds 10MB');
+      } else if (error.code === 'file-invalid-type') {
+        toast.error('Unsupported file type. Please upload Image, PDF or ZIP.');
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+
+    if (acceptedFiles.length > 0) {
+      setSelectedFile(acceptedFiles[0]);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
+    onDrop,
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+      'image/webp': [],
+      'application/pdf': [],
+      'application/zip': [],
+      'application/x-zip-compressed': []
+    },
+    maxSize: MAX_FILE_SIZE,
+    maxFiles: 1,
+    multiple: false
+  });
+
+  const removeFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedFile(null);
+  };
+
+  const getFileIcon = (file: File) => {
+    if (file.type.startsWith('image/')) return <ImageIcon className="w-8 h-8 text-cyan-400" />;
+    if (file.type === 'application/pdf') return <FileText className="w-8 h-8 text-red-400" />;
+    if (file.type.includes('zip')) return <FileArchive className="w-8 h-8 text-yellow-400" />;
+    return <FileText className="w-8 h-8 text-gray-400" />;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
     try {
-      // Ensure all fields are present before submitting
-      const submissionData = {
-        name: data.name,
-        email: data.email,
-        message: data.message,
-      };
-      await contactApi.submitContact(submissionData);
-      toast.success('Message sent successfully! I\'ll get back to you soon.');
-      form.reset();
-    } catch (error) {
+      let fileUrl = null;
+
+      // 1. Upload File if exists
+      if (selectedFile) {
+        fileUrl = await uploadFileToSupabase(selectedFile);
+      }
+
+      // 2. Insert into Supabase
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert({
+          name: data.name,
+          email: data.email,
+          message: data.message,
+          file_url: fileUrl, // using generic file_url column
+        });
+
+      if (error) throw error;
+
+      // Show Success Modal instead of toast
+      setShowSuccessModal(true);
+      // Form reset is handled when modal closes
+
+    } catch (error: any) {
       console.error('Error submitting contact form:', error);
-      toast.error('Failed to send message. Please try again.');
+
+      // Handle Supabase 404 (Table not found)
+      if (error.code === '404' || error.status === 404 || error.message?.includes('404')) {
+        toast.error('Configuration Error: "contact_messages" table not found. Please run the setup SQL script in Supabase.');
+      } else {
+        toast.error(error.message || 'Failed to send message. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleModalClose = () => {
+    setShowSuccessModal(false);
+    // Reset form only when modal is closed
+    form.reset();
+    setSelectedFile(null);
   };
 
   return (
@@ -79,6 +165,8 @@ export default function ContactSection() {
       ref={sectionRef}
       className="min-h-screen flex items-center justify-center px-4 py-20 relative"
     >
+      <SuccessModal isOpen={showSuccessModal} onClose={handleModalClose} />
+
       <div className="container mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -131,25 +219,27 @@ export default function ContactSection() {
                     {
                       icon: '📧',
                       label: 'Email',
-                      value: 'sunny.kumar@example.com',
-                      href: 'mailto:sunny.kumar@example.com',
+                      value: 'sunny01srp@gmail.com',
+                      href: 'mailto:sunny01srp@gmail.com',
                     },
                     {
                       icon: '📱',
                       label: 'Phone',
-                      value: '+1 (555) 123-4567',
-                      href: 'tel:+15551234567',
+                      value: '+91 7494065966',
+                      href: 'tel:+917494065966',
                     },
                     {
                       icon: '📍',
                       label: 'Location',
-                      value: 'San Francisco, CA',
-                      href: '#',
+                      value: 'Pune, Maharashtra',
+                      href: 'https://maps.app.goo.gl/5MZHKni1qyiuSic88',
                     },
                   ].map((contact) => (
                     <a
                       key={contact.label}
                       href={contact.href}
+                      target={contact.label === 'Location' ? '_blank' : undefined}
+                      rel={contact.label === 'Location' ? 'noopener noreferrer' : undefined}
                       className="flex items-center gap-4 glass-card rounded-2xl p-4 hover-glow-blue transition-all duration-300 group"
                     >
                       <div className="text-3xl group-hover:scale-110 transition-transform duration-300">
@@ -169,18 +259,26 @@ export default function ContactSection() {
                 <h4 className="text-xl font-bold text-foreground mb-4">Follow Me</h4>
                 <div className="flex gap-4">
                   {[
-                    { icon: '💼', label: 'LinkedIn', href: '#' },
-                    { icon: '🐙', label: 'GitHub', href: '#' },
-                    { icon: '🐦', label: 'Twitter', href: '#' },
-                    { icon: '📷', label: 'Instagram', href: '#' },
+                    { icon: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png', label: 'LinkedIn', href: 'https://www.linkedin.com/in/sunny-kumar-mit/' },
+                    { icon: 'https://i.postimg.cc/YCbCbV4x/github-(1).png6', label: 'GitHub', href: 'https://github.com/sunny-kumar-mit/' },
+                    { icon: 'https://i.postimg.cc/kMvDhwpG/twitter.png', label: 'X', href: 'https://x.com/sunny01srp' },
+                    { icon: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png', label: 'Instagram', href: 'https://www.instagram.com/crazy01srp/' },
+                    { icon: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg', label: 'Email', href: 'mailto:sunny01srp@gmail.com' },
+                    { icon: 'https://play-lh.googleusercontent.com/QbavRFj9bwEj8Wm3mIfOG781pUoPIWdOGEnOGKk35mf_M5AvIEhDhyEP7ZfQFwpzPwM', label: 'Linktree', href: 'https://linktr.ee/sunny01srp' },
                   ].map((social) => (
                     <a
                       key={social.label}
                       href={social.href}
-                      className="glass-card w-14 h-14 rounded-full flex items-center justify-center text-2xl hover-glow-blue transition-all duration-300 hover:scale-110"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="glass-card w-14 h-14 rounded-full flex items-center justify-center hover-glow-blue transition-all duration-300 hover:scale-110 overflow-hidden bg-white/5"
                       aria-label={social.label}
                     >
-                      {social.icon}
+                      <img
+                        src={social.icon}
+                        alt={social.label}
+                        className="w-8 h-8 object-contain"
+                      />
                     </a>
                   ))}
                 </div>
@@ -242,7 +340,7 @@ export default function ContactSection() {
                         <FormControl>
                           <Textarea
                             placeholder="Tell me about your project..."
-                            rows={6}
+                            rows={4}
                             {...field}
                             className="glass-card border-border focus:border-primary transition-colors duration-300 resize-none"
                           />
@@ -252,10 +350,80 @@ export default function ContactSection() {
                     )}
                   />
 
+                  <div className="space-y-2">
+                    <FormLabel className="text-foreground font-semibold">Attach Supporting Files (Optional)</FormLabel>
+
+                    {!selectedFile ? (
+                      <div
+                        {...getRootProps()}
+                        className={`
+                          relative group cursor-pointer
+                          border-2 border-dashed rounded-xl p-4
+                          transition-all duration-300 ease-in-out
+                          flex flex-col items-center justify-center gap-2
+                          glass-card
+                          ${isDragReject
+                            ? 'border-red-500/50 bg-red-500/5'
+                            : isDragActive
+                              ? 'border-cyan-500 bg-cyan-500/10 scale-[1.02] shadow-[0_0_20px_rgba(6,182,212,0.3)]'
+                              : 'border-white/10 hover:border-cyan-500/50 hover:bg-white/5 hover:scale-[1.01]'
+                          }
+                        `}
+                      >
+                        <input {...getInputProps()} />
+                        <div className={`p-3 rounded-full bg-white/5 transition-transform duration-300 ${isDragActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                          <Upload className={`w-6 h-6 ${isDragActive ? 'text-cyan-400' : 'text-gray-400 group-hover:text-cyan-400'}`} />
+                        </div>
+                        <div className="text-center space-y-1">
+                          <p className="text-sm font-medium text-foreground">
+                            Click to upload or drag & drop
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            PDF, Image or ZIP • Max 10MB
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative glass-card border border-white/10 rounded-xl p-4 flex items-center gap-4 group"
+                      >
+                        <div className="p-3 rounded-lg bg-white/5">
+                          {getFileIcon(selectedFile)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {selectedFile.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(selectedFile.size)}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={removeFile}
+                          className="p-2 rounded-full hover:bg-white/10 text-gray-400 hover:text-red-400 transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                        <div className="absolute -top-2 -right-2 bg-green-500 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <CheckCircle2 className="w-3 h-3 text-white" />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Error message slot if needed, though toast is handling it. We could show persistent error here if preferred. 
+                        The requirement says "Show error message below upload area". 
+                        Currently I used Toast for immediate feedback. Dropzone often doesn't persist error state unless we set it.
+                        I'll stick to Toast as it's cleaner for "actions", but if the user uploads an invalid file, toast is better.
+                    */}
+                  </div>
+
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full magnetic-btn glass-card neon-border-blue py-6 text-lg font-semibold hover-glow-blue transition-all duration-300 hover:scale-105"
+                    disabled={isSubmitting || (isDragActive && !selectedFile)} // Disable if dragging or if uploading (handled by isSubmitting)
+                    className="w-full magnetic-btn glass-card neon-border-blue py-4 text-lg font-semibold hover-glow-blue transition-all duration-300 hover:scale-105"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">

@@ -6,6 +6,7 @@ import AboutSection from '@/components/AboutSection';
 import SkillsSection from '@/components/SkillsSection';
 import ProjectsSection from '@/components/ProjectsSection';
 import ExperienceSection from '@/components/ExperienceSection';
+import CertificationsSection from '@/components/CertificationsSection';
 import ContactSection from '@/components/ContactSection';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -19,12 +20,12 @@ export default function Portfolio() {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 500);
+          setTimeout(() => setIsLoading(false), 800);
           return 100;
         }
-        return prev + 10;
+        return prev + 2;
       });
-    }, 150);
+    }, 60);
 
     return () => clearInterval(interval);
   }, []);
@@ -98,7 +99,7 @@ export default function Portfolio() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="hidden md:flex items-center gap-8"
                 >
-                  {['Home', 'About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item, index) => (
+                  {['Home', 'About', 'Skills', 'Projects', 'Experience', 'Certifications', 'Contact'].map((item, index) => (
                     <motion.a
                       key={item}
                       href={`#${item.toLowerCase()}`}
@@ -137,6 +138,7 @@ export default function Portfolio() {
             <SkillsSection />
             <ProjectsSection />
             <ExperienceSection />
+            <CertificationsSection />
             <ContactSection />
           </main>
 
@@ -146,30 +148,46 @@ export default function Portfolio() {
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-left">
                   <p className="text-muted-foreground">
-                    © 2025 Sunny Kumar. All rights reserved.
+                    © 2026 Sunny Kumar. All rights reserved.
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Built with React, Three.js, GSAP & Framer Motion
+                    Always learning, always building, always improving 🌱
+
                   </p>
                 </div>
 
                 <div className="flex gap-4">
                   {[
-                    { icon: '💼', label: 'LinkedIn', href: '#' },
-                    { icon: '🐙', label: 'GitHub', href: '#' },
-                    { icon: '✉️', label: 'Email', href: '#contact' },
+                    { icon: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png', label: 'LinkedIn', href: 'https://www.linkedin.com/in/sunny-kumar-mit/' },
+                    { icon: 'https://i.postimg.cc/YCbCbV4x/github-(1).png6', label: 'GitHub', href: 'https://github.com/sunny-kumar-mit/' },
+                    { icon: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg', label: 'Email', href: 'mailto:sunny01srp@gmail.com' },
                   ].map((social) => (
                     <a
                       key={social.label}
                       href={social.href}
-                      className="glass-card w-12 h-12 rounded-full flex items-center justify-center text-xl hover-glow-blue transition-all duration-300 hover:scale-110"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="glass-card w-12 h-12 rounded-full flex items-center justify-center hover-glow-blue transition-all duration-300 hover:scale-110 overflow-hidden bg-white/5"
                       aria-label={social.label}
                     >
-                      {social.icon}
+                      <img
+                        src={social.icon}
+                        alt={social.label}
+                        className="w-6 h-6 object-contain"
+                      />
                     </a>
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* Sitting Boy GIF */}
+            <div className="absolute bottom-0 right-4 pointer-events-none hidden md:block">
+              <img
+                src="https://media.tenor.com/GfSX-u7VZQ4AAAAi/ninja.gif"
+                alt="Saying Hi"
+                className="w-24 h-24 object-contain"
+              />
             </div>
           </footer>
 

@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 
 const experiences = [
   {
-    year: '2023 - Present',
+    year: '2026 - Present',
     title: 'Senior Full Stack Developer',
-    company: 'Tech Innovations Inc.',
+    // company: 'Tech Innovations Inc.',
     description: 'Leading development of scalable web applications using MERN stack. Implementing modern UI/UX designs with advanced animations and 3D effects.',
     achievements: [
       'Improved application performance by 40%',
@@ -15,9 +15,9 @@ const experiences = [
     color: 'blue',
   },
   {
-    year: '2022 - 2023',
+    year: '2024 - 2025',
     title: 'Full Stack Developer',
-    company: 'Digital Solutions Ltd.',
+    // company: 'Digital Solutions Ltd.',
     description: 'Developed and maintained multiple client projects using React, Node.js, and MongoDB. Focused on creating responsive and accessible web applications.',
     achievements: [
       'Delivered 15+ successful projects',
@@ -27,9 +27,9 @@ const experiences = [
     color: 'purple',
   },
   {
-    year: '2021 - 2022',
+    year: '2024 - 2025',
     title: 'Frontend Developer',
-    company: 'Creative Web Studio',
+    // company: 'Creative Web Studio',
     description: 'Specialized in creating interactive and animated user interfaces using React and modern CSS frameworks. Collaborated with designers to bring creative visions to life.',
     achievements: [
       'Built 20+ responsive websites',
@@ -39,16 +39,16 @@ const experiences = [
     color: 'cyan',
   },
   {
-    year: '2020 - 2021',
+    year: '2024 - 2025',
     title: 'Junior Web Developer',
-    company: 'StartUp Hub',
+    // company: 'StartUp Hub',
     description: 'Started career building websites and web applications. Learned full-stack development and gained experience with various technologies and frameworks.',
     achievements: [
       'Completed intensive training program',
       'Contributed to 10+ projects',
       'Earned multiple certifications',
     ],
-    color: 'blue',
+    color: 'purple',
   },
 ];
 
@@ -59,9 +59,7 @@ export default function ExperienceSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        setIsVisible(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
@@ -155,9 +153,8 @@ export default function ExperienceSection() {
                   initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                   animate={isVisible ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-                  className={`relative flex items-center ${
-                    index % 2 === 0 ? 'xl:flex-row' : 'xl:flex-row-reverse'
-                  } flex-col xl:gap-12`}
+                  className={`relative flex items-center ${index % 2 === 0 ? 'xl:flex-row' : 'xl:flex-row-reverse'
+                    } flex-col xl:gap-12`}
                 >
                   {/* Timeline dot */}
                   <div className="absolute left-8 xl:left-1/2 transform xl:-translate-x-1/2 -translate-y-1/2 top-8">
@@ -168,9 +165,8 @@ export default function ExperienceSection() {
                   <div className={`w-full xl:w-[calc(50%-3rem)] ml-20 xl:ml-0 ${index % 2 === 0 ? 'xl:text-right' : 'xl:text-left'}`}>
                     <div className={`glass-card ${getGlowClass(exp.color)} rounded-3xl p-8 space-y-4 group`}>
                       {/* Year badge */}
-                      <div className={`inline-block glass-card px-4 py-2 rounded-full text-sm font-semibold ${
-                        exp.color === 'blue' ? 'neon-text-blue' : exp.color === 'purple' ? 'neon-text-purple' : 'neon-text-cyan'
-                      }`}>
+                      <div className={`inline-block glass-card px-4 py-2 rounded-full text-sm font-semibold ${exp.color === 'blue' ? 'neon-text-blue' : exp.color === 'purple' ? 'neon-text-purple' : 'neon-text-cyan'
+                        }`}>
                         {exp.year}
                       </div>
 

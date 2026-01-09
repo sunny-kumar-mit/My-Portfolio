@@ -1,123 +1,101 @@
-# Sunny Kumar - Premium Portfolio
+# ✨ Sunny Kumar - Professional Portfolio
 
-A high-end, ultra-modern personal portfolio web application featuring cinematic animations, 3D effects, and futuristic interactions designed for recruiters, startups, and clients.
+> A high-performance, interactive portfolio website built with modern web technologies. showcasing creative developer skills through a Neon Cyberpunk aesthetic.
 
-## ✨ Features
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+![Tech](https://img.shields.io/badge/Stack-React%20%7C%20Vite%20%7C%20Supabase-blue)
 
-### 🎨 Visual Design
-- **Neon Cyberpunk Theme**: Deep black backgrounds with neon blue (#00D9FF), electric purple (#B24BF3), and cyan (#4DFFF3) accents
-- **Glassmorphism Effects**: Frosted glass cards with backdrop blur and neon outline borders
-- **Custom Cursor**: Interactive cursor with hover state changes
-- **Smooth Animations**: GSAP scroll-triggered zoom effects and Framer Motion transitions
+## 🚀 Overview
 
-### 🚀 Technical Features
-- **Three.js Background**: Animated 3D particles and geometric shapes that react to mouse movement and scroll
-- **Typewriter Animation**: Rotating text in hero section with smooth transitions
-- **Scroll Animations**: Parallax effects and zoom animations triggered by scroll position
-- **Responsive Design**: Mobile-first approach with breakpoints for all devices
-- **Contact Form**: Integrated with Supabase for storing form submissions
+This portfolio is designed to be more than just a static resume—it's an immersive experience. It features 3D backgrounds, complex animations, and a unique "Desktop Mode Enforcer" for mobile devices to ensure the best possible viewing experience.
 
-### 📱 Sections
-1. **Hero Section**: Split layout with professional photo and animated typewriter text
-2. **About Me**: Animated text reveal with statistics and highlights
-3. **Skills**: Categorized skill cards with hover effects (Frontend, Backend, Database, Tools, Animation)
-4. **Projects**: Portfolio showcase with project cards and hover glow effects
-5. **Experience**: Timeline-style layout showing career progression
-6. **Contact**: Animated contact form with social links and contact information
+### Key Features
 
-## Project Info
+-   **🎨 Neon Glassmorphism UI**: A premium dark-mode aesthetic with neon glows and glass cards.
+-   **🖥️ Desktop Mode Enforcer**: A custom system that detects mobile devices and intelligently forces a 1200px viewport for a consistent, high-fidelity experience.
+-   **📊 Visitor Tracking**: Silent, anonymous visitor logging (IP & Location) integrated with Supabase.
+-   **✨ Interactive Hero**: Typewriter effects, parallax hover states, and 3D background elements.
+-   **📁 Project Showcase**: Detailed modal views for projects with image galleries and tech stacks.
+-   **📝 Contact System**: Fully functional contact form with file/image uploads, stored securely in Supabase.
+-   **🔒 Secure Resume Download**: One-click protected download for the latest resume.
 
-## Project Directory
+## 🛠️ Tech Stack
 
-```
-├── README.md # Documentation
-├── components.json # Component library configuration
-├── index.html # Entry file
-├── package.json # Package management
-├── postcss.config.js # PostCSS configuration
-├── public # Static resources directory
-│   ├── favicon.png # Icon
-│   └── images # Image resources
-├── src # Source code directory
-│   ├── App.tsx # Entry file
-│   ├── components # Components directory
-│   ├── context # Context directory
-│   ├── db # Database configuration directory
-│   ├── hooks # Common hooks directory
-│   ├── index.css # Global styles
-│   ├── layout # Layout directory
-│   ├── lib # Utility library directory
-│   ├── main.tsx # Entry file
-│   ├── routes.tsx # Routing configuration
-│   ├── pages # Pages directory
-│   ├── services # Database interaction directory
-│   ├── types # Type definitions directory
-├── tsconfig.app.json # TypeScript frontend configuration file
-├── tsconfig.json # TypeScript configuration file
-├── tsconfig.node.json # TypeScript Node.js configuration file
-└── vite.config.ts # Vite configuration file
-```
+-   **Core**: React 18, TypeScript, Vite
+-   **Styling**: Tailwind CSS, PostCSS
+-   **Animations**: Framer Motion (`motion/react`), GSAP
+-   **3D Effects**: Three.js, React Three Fiber
+-   **Icons**: Lucide React
+-   **Backend & Database**: Supabase (PostgreSQL)
+-   **Routing**: React Router DOM
+-   **Form Handling**: React Hook Form, Zod
 
-## Tech Stack
+## 📦 Installation & Setup
 
-- **Frontend**: React 18 + TypeScript + Vite
-- **Styling**: Tailwind CSS + Custom CSS animations
-- **UI Components**: shadcn/ui component library
-- **3D Graphics**: Three.js for animated backgrounds
-- **Animations**: GSAP (ScrollTrigger) + Framer Motion
-- **Backend**: Supabase (PostgreSQL database)
-- **Form Handling**: React Hook Form + Zod validation
-- **Icons & Fonts**: Google Fonts (Inter), Unicode emojis
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/sunny-kumar-mit/portfolio.git
+    cd portfolio
+    ```
 
-## Development Guidelines
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-### How to edit code locally?
+3.  **Environment Setup**
+    Create a `.env` file in the root directory with your Supabase credentials:
+    ```env
+    VITE_SUPABASE_URL=your_supabase_project_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
 
-You can choose [VSCode](https://code.visualstudio.com/Download) or any IDE you prefer. The only requirement is to have Node.js and npm installed.
+4.  **Run Locally**
+    ```bash
+    npm run dev
+    ```
 
-### Environment Requirements
+## 🗄️ Database Setup (Supabase)
 
-```
-# Node.js ≥ 20
-# npm ≥ 10
-Example:
-# node -v   # v20.18.3
-# npm -v    # 10.8.2
+To enable all features, run the following SQL migrations in your Supabase SQL Editor:
+
+### 1. Contact Messages
+```sql
+CREATE TABLE public.contact_messages (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL,
+    file_url TEXT
+);
+-- Enable RLS and policies for insert/select
 ```
 
-### Installing Node.js on Windows
-
-```
-# Step 1: Visit the Node.js official website: https://nodejs.org/, click download. The website will automatically suggest a suitable version (32-bit or 64-bit) for your system.
-# Step 2: Run the installer: Double-click the downloaded installer to run it.
-# Step 3: Complete the installation: Follow the installation wizard to complete the process.
-# Step 4: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
-```
-
-### Installing Node.js on macOS
-
-```
-# Step 1: Using Homebrew (Recommended method): Open Terminal. Type the command `brew install node` and press Enter. If Homebrew is not installed, you need to install it first by running the following command in Terminal:
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-Alternatively, use the official installer: Visit the Node.js official website. Download the macOS .pkg installer. Open the downloaded .pkg file and follow the prompts to complete the installation.
-# Step 2: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
+### 2. Visitor Tracking
+```sql
+CREATE TABLE public.site_visits (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    ip_address TEXT,
+    city TEXT,
+    country TEXT,
+    region TEXT,
+    user_agent TEXT,
+    visited_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+-- Enable RLS (Public Insert, Admin Select)
 ```
 
-### After installation, follow these steps:
+## 📱 Mobile Experience
 
-```
-# Step 1: Download the code package
-# Step 2: Extract the code package
-# Step 3: Open the code package with your IDE and navigate into the code directory
-# Step 4: In the IDE terminal, run the command to install dependencies: npm i
-# Step 5: In the IDE terminal, run the command to start the development server: npm run dev -- --host 127.0.0.1
-# Step 6: if step 5 failed, try this command to start the development server: npx vite --host 127.0.0.1
-```
+The application includes a `useDesktopEnforcer` hook.
+-   **On Mobile Load**: Shows a "Best Viewed on Desktop" polite modal using native mobile scaling.
+-   **On Continue**: Forces the viewport to `width=1200`, giving mobile users the full desktop layout experience without breaking the UI.
 
-### How to develop backend services?
+## 📄 License
 
-Configure environment variables and install relevant dependencies.If you need to use a database, please use the official version of Supabase.
+This project is open source and available under the [MIT License](LICENSE).
 
-## Learn More
+---
 
-You can also check the help documentation: Download and Building the app（ [https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en](https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en)）to learn more detailed content.
+Based in India 🇮🇳 | Built with ❤️ by **Sunny Kumar**
